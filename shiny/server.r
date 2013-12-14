@@ -1,88 +1,78 @@
 library(shiny)
 library(grid)
+library(yaml)
 
-#load coordinates of wings and elements
-coords <- read.delim("melpomene_pattern_coordinates.tsv")
+# Heliconius colours
+hmel.col<-c(black  = "black",
+            red    = rgb(1,0.2,0,1),
+            yellow = rgb(1,1,0.4,1),
+            white  = rgb(1,1,0.6,1)
+           )
 
-wingPatternElement<-function(x, y, col, fill) {
-    polygonGrob(x, y, gp=gpar(col=col, fill=fill), default.units="native")
-}
+# load coordinates of wings and elements
+coords<-yaml.load_file("melpomene_pattern_coordinates.yml")
 
-blackForewing<-function() {
-    wingPatternElement(coords$L_FW_X, coords$L_FW_Y, "black", "black")
-}
-
-blackHindwing<-function() {
-    wingPatternElement(coords$L_HW_X, coords$L_HW_Y, "black", "black")
+wingPatternElement<-function(element) {
+    e<-coords[[element]]
+    polygonGrob(e$Xval,
+                e$Yval,
+                default.units="native",
+                gp=gpar(col=hmel.col[e$col], fill=hmel.col[e$col])
+    )
 }
 
 whiteForewingPatches<-function() {
     gList(
-        wingPatternElement(coords$L_N1_X, coords$L_N1_Y, rgb(1,1,0.6,1), rgb(1,1,0.6,1)),
-        wingPatternElement(coords$L_N2_X, coords$L_N2_Y, rgb(1,1,0.6,1), rgb(1,1,0.6,1)),
-        wingPatternElement(coords$L_N3_X, coords$L_N3_Y, rgb(1,1,0.6,1), rgb(1,1,0.6,1)),
-        wingPatternElement(coords$L_N4_X, coords$L_N4_Y, rgb(1,1,0.6,1), rgb(1,1,0.6,1))
+        wingPatternElement("whiteForewingPatch1"),
+        wingPatternElement("whiteForewingPatch2"),
+        wingPatternElement("whiteForewingPatch3"),
+        wingPatternElement("whiteForewingPatch4")
     )
 }
 
 redForewingPatches<-function() {
     gList(
-        wingPatternElement(coords$L_BandN1_X, coords$L_BandN1_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_BandN2_X, coords$L_BandN2_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_BandN3_X, coords$L_BandN3_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_BandN4_X, coords$L_BandN4_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1))
+        wingPatternElement("redForewingPatch1"),
+        wingPatternElement("redForewingPatch2"),
+        wingPatternElement("redForewingPatch3"),
+        wingPatternElement("redForewingPatch4")
     )
-}
-
-redForewingBand<-function() {
-    wingPatternElement(coords$L_Band_X, coords$L_Band_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1))
 }
 
 DennisForewingPatches<-function() {
     gList(
-        wingPatternElement(coords$L_Fwden1_X, coords$L_Fwden1_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_Fwden2_X, coords$L_Fwden2_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_Fwden3_X, coords$L_Fwden3_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_Fwden4_X, coords$L_Fwden4_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1))
+        wingPatternElement("DennisForewingPatch1"),
+        wingPatternElement("DennisForewingPatch2"),
+        wingPatternElement("DennisForewingPatch3"),
+        wingPatternElement("DennisForewingPatch4")
     )
-}
-
-DennisHindwingBand<-function() {
-    wingPatternElement(coords$L_Hwden_X, coords$L_Hwden_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1))
 }
 
 raysForewingPatches<-function() {
     gList(
-        wingPatternElement(coords$L_ray1_X, coords$L_ray1_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_ray2_X, coords$L_ray2_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_ray3_X, coords$L_ray3_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_ray4_X, coords$L_ray4_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_ray5_X, coords$L_ray5_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1)),
-        wingPatternElement(coords$L_ray6_X, coords$L_ray6_Y, rgb(1,0.2,0,1), rgb(1,0.2,0,1))
+        wingPatternElement("raysForewingPatch1"),
+        wingPatternElement("raysForewingPatch2"),
+        wingPatternElement("raysForewingPatch3"),
+        wingPatternElement("raysForewingPatch4"),
+        wingPatternElement("raysForewingPatch5"),
+        wingPatternElement("raysForewingPatch6")
     )
-}
-
-yellowHindwingBand<-function() {
-    wingPatternElement(coords$L_Yb_X, coords$L_Yb_Y, rgb(1,1,0.4,1), rgb(1,1,0.4,1))
 }
 
 shinyServer(function(input, output) {
     
     melpomene<-reactive({
 
-        wing<-gList(blackForewing(),blackHindwing())
+        wing<-gList(wingPatternElement("blackForewing"),
+                    wingPatternElement("blackHindwing"))
 
         if (input$N) wing<-gList(wing, whiteForewingPatches())
-
         if (input$B) {
-          if (input$N) wing<-gList(wing, redForewingPatches()) else wing<-gList(wing, redForewingBand())
+          if (input$N) wing<-gList(wing, redForewingPatches()) else wing<-gList(wing, wingPatternElement("redForewingBand"))
         }
-  
-        if (input$D) wing<-gList(wing, DennisForewingPatches(), DennisHindwingBand())
-
+        if (input$D) wing<-gList(wing, DennisForewingPatches(), wingPatternElement("DennisHindwingBand"))
         if (input$R) wing<-gList(wing, raysForewingPatches())
-  
-        if (input$Y) wing<-gList(wing, yellowHindwingBand())
+        if (input$Y) wing<-gList(wing, wingPatternElement("yellowHindwingBand"))
 
         wing
     })

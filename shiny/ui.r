@@ -9,12 +9,13 @@ shinyUI(pageWithSidebar(
       checkboxInput("B","Red forewing band"),
       checkboxInput("D","Dennis"),
       checkboxInput("R","Rays"),
-      checkboxInput("Y","Yellow band"),
+      checkboxInput("Yb","Yellow band"),
       checkboxInput("N","White forewing band")
   ),
   
   mainPanel(
-      plotOutput("wing")
+      plotOutput("wing"),
+      plotOutput("karyotype")
   )
 ))
 
